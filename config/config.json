@@ -1,27 +1,9 @@
 {
-    "ssl": {
-      "cert": "../ssl/cert.pem",
-      "key": "../ssl/key.pem"
-    },
     "listeners": [
       {
         "address": "0.0.0.0",
         "port": 80,
         "https": true
-      }
-    ],
-    "db_clients": [
-      {
-        "name": "MangaNekoDatabase",
-        "rdbms": "MySQL",
-        "host": "127.0.0.1",
-        "port": 3306,
-        "dbname": "MangaNeko",
-        "user": "root",
-        "passwd": "safepassword",
-        "is_fast": false,
-        "connection_number": 1,
-        "file_name": ""
       }
     ]
   }
