@@ -39,7 +39,6 @@ set_target_properties( MangaNeko
 
 #SSL Certificates
 file(COPY config DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin)
-file(COPY ssl DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 #Respect source code folder structure
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
