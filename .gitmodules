@@ -1,3 +1,6 @@
 [submodule "libraries/drogon"]
 	path = libraries/drogon
 	url = https://github.com/drogonframework/drogon
+[submodule "libraries/bit7z"]
+	path = libraries/bit7z
+	url = https://github.com/rikyoz/bit7z.git

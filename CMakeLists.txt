@@ -14,11 +14,26 @@ file(GLOB_RECURSE mnSourceFiles
     "config/*" # Just to be able to browse config files in IDEs
 )
 
+if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/dependencies/sources")
+    #Copy 7zip source code
+    file(COPY libraries/bit7z/third_party/7-zip DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/dependencies/sources")
+    
+    #Build Linux 7zip so
+    execute_process(
+        COMMAND make -f ../../cmpl_gcc.mak
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/dependencies/sources/7-zip/CPP/7zip/Bundles/Format7zF"
+    )
+
+    #Copy the 7zip shared object
+    file(COPY "${CMAKE_CURRENT_BINARY_DIR}/dependencies/sources/7-zip/CPP/7zip/Bundles/Format7zF/b/g/7z.so" DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/dependencies/)
+endif()
+
 add_executable(MangaNeko ${mnSourceFiles})
 
 #Add and link libraries
 add_subdirectory(libraries/drogon)
-target_link_libraries(MangaNeko PRIVATE drogon)
+add_subdirectory(libraries/bit7z)
+target_link_libraries(MangaNeko PRIVATE drogon PRIVATE bit7z64)
 
 #Specify targets output directory
 set_target_properties( MangaNeko
