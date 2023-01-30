@@ -10,5 +10,8 @@
     "upload_path": "/tmp/manganeko/uploads",
     "client_max_body_size": "5G",
     "client_max_memory_body_size": "50M"
+  },
+  "MangaNeko": {
+    "entrypoint": "/example/entrypoint"
   }
 }
