@@ -32,7 +32,7 @@ endif()
 add_executable(MangaNeko ${mnSourceFiles})
 
 #Add RapidJson
-target_include_directories(MangaNeko PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/libraries/rapidjson/include/rapidjson")
+target_include_directories(MangaNeko PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/libraries/rapidjson/include")
 
 #Add and link libraries
 add_subdirectory(libraries/drogon)
