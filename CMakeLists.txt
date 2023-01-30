@@ -14,6 +14,7 @@ file(GLOB_RECURSE mnSourceFiles
     "config/*" # Just to be able to browse config files in IDEs
 )
 
+#Build 7zip
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/dependencies/sources")
     #Copy 7zip source code
     file(COPY libraries/bit7z/third_party/7-zip DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/dependencies/sources")
