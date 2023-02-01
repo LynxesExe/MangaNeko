@@ -12,6 +12,6 @@
     "client_max_memory_body_size": "50M"
   },
   "MangaNeko": {
-    "entrypoint": "/example/entrypoint"
+    "entrypoint": "/tmp/manganeko/uploads"
   }
 }
