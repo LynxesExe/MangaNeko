@@ -1,5 +1,6 @@
 #include "manga.h"
 #include "../utils/config.h"
+#include "../utils/bit7zipLibrarySingleton.h"
 #include <filesystem>
 
 void Manga::uploadManga(const HttpRequestPtr& req,
@@ -44,12 +45,58 @@ void Manga::uploadManga(const HttpRequestPtr& req,
 
 void Manga::getPage(const HttpRequestPtr& req,
     std::function<void(const HttpResponsePtr&)>&& callback,
-    std::string&& mangaId, unsigned int chapter, unsigned int page) const
+    std::string&& mangaName, unsigned int chapter, unsigned int page) const
 {
-    std::cout << "Requested manga ID: " << mangaId << std::endl;
-    std::cout << "Chapter: " << chapter << std::endl;
-    std::cout << "Page: " << page << std::endl;
     auto resp = HttpResponse::newHttpResponse();
     resp->setStatusCode(k200OK);
+
+    std::filesystem::path currentFilePath(MangaNeko::globalConfiguration.entryPointPath);
+    currentFilePath.append(mangaName);
+    if (std::filesystem::exists(currentFilePath))
+    {
+        // TODO: Temporary hardcoded to ZIP, figure out how to dela with this later
+        bit7z::BitArchiveReader archive{ Bit7ZipLibrarySingleton::getBit7zLibrarySingleton(), currentFilePath, bit7z::BitFormat::Zip };
+        auto archiveMetadata = archive.items();
+        std::sort(archiveMetadata.begin(), archiveMetadata.end(), [](const auto& lhs, const auto& rhs)
+            {
+                return lhs.name() < rhs.name();
+            });
+        bool found = false;
+        std::string itemPath;
+        for (auto currentDirectory : archiveMetadata)
+        {
+            if (!found && currentDirectory.isDir() && currentDirectory.path().find(std::to_string(chapter)) != std::string::npos)
+            {
+                for (auto& archiveItem : archiveMetadata)
+                {
+                    if (!found && !archiveItem.isDir()
+                        && archiveItem.path().find(currentDirectory.path()) != std::string::npos
+                        && archiveItem.name().find(std::to_string(page)) != std::string::npos)
+                    {
+                        found = true;
+                        itemPath = archiveItem.path();
+                    }
+                }
+            }
+        }
+        if (found)
+        {
+            bit7z::BitFileExtractor extractor{ Bit7ZipLibrarySingleton::getBit7zLibrarySingleton(), bit7z::BitFormat::Zip };
+            std::vector<bit7z::byte_t> buffer;
+            extractor.extractMatching(currentFilePath, itemPath, buffer);
+            resp = HttpResponse::newFileResponse(&buffer.front(), buffer.size());
+            resp->setStatusCode(k200OK);
+        }
+        else
+        {
+            resp->setStatusCode(k404NotFound);
+            resp->addHeader("manga-neko-error", "Manga page not found!");
+        }
+    }
+    else
+    {
+        resp->setStatusCode(k404NotFound);
+        resp->addHeader("manga-neko-error", "Manga entry not found.");
+    }
     callback(resp);
 }
