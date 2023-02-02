@@ -100,3 +100,24 @@ void Manga::getPage(const HttpRequestPtr& req,
     }
     callback(resp);
 }
+
+void Manga::listAvailable(const HttpRequestPtr& req,
+    std::function<void(const HttpResponsePtr&)>&& callback) const
+{
+    Json::Value responseRoot;
+    Json::Value entriesArray(Json::arrayValue);
+    for (const auto& entry : std::filesystem::directory_iterator(MangaNeko::globalConfiguration.entryPointPath))
+    {
+        Json::Value entryValue;
+        entryValue["name"] = std::string(std::filesystem::relative(entry.path(), MangaNeko::globalConfiguration.entryPointPath));
+        entriesArray.append(entryValue);
+    }
+    responseRoot["entries"] = entriesArray;
+
+    Json::StreamWriterBuilder builder;
+    std::string responseBody = Json::writeString(builder, responseRoot);
+    auto resp = HttpResponse::newHttpResponse();
+    resp->setBody(responseBody);
+    resp->setStatusCode(k200OK);
+    callback(resp);
+}
