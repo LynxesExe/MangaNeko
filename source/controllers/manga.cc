@@ -110,9 +110,12 @@ void Manga::listAvailable(const HttpRequestPtr& req,
     Json::Value entriesArray(Json::arrayValue);
     for (const auto& entry : std::filesystem::directory_iterator(MangaNeko::globalConfiguration.entryPointPath))
     {
+        if (!entry.is_directory())
+        {
         Json::Value entryValue;
         entryValue["name"] = std::string(std::filesystem::relative(entry.path(), MangaNeko::globalConfiguration.entryPointPath));
         entriesArray.append(entryValue);
+        }
     }
     responseRoot["entries"] = entriesArray;
 
