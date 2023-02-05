@@ -146,7 +146,7 @@ void Manga::getMetadata(const HttpRequestPtr& req,
 
         for (auto currentDirectory : archiveMetadata)
         {
-            if (currentDirectory.isDir())
+            if (currentDirectory.isDir() && currentDirectory.path().find_first_of("1234567890") != std::string::npos)
             {
                 Json::Value chapterEntry(Json::objectValue);
                 // This won't work, we need for this to be a number, but how do we decide is chapters start from 0 or 1?
