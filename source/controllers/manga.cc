@@ -3,6 +3,8 @@
 #include "../utils/bit7zipLibrarySingleton.h"
 #include <filesystem>
 
+using namespace alpha1;
+
 void Manga::uploadManga(const HttpRequestPtr& req,
     std::function<void(const HttpResponsePtr&)>&& callback) const
 {
