@@ -1,5 +1,6 @@
 #pragma once
 #include <bit7z/bitfileextractor.hpp>
+#include <bit7z/bit7z.hpp>
 class Bit7ZipLibrarySingleton {
 public:
 
