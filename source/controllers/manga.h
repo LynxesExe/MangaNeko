@@ -8,7 +8,7 @@ namespace alpha1
     {
     public:
         METHOD_LIST_BEGIN
-            METHOD_ADD(Manga::uploadManga, "/upload", Post);
+        METHOD_ADD(Manga::uploadManga, "/upload", Post);
         METHOD_ADD(Manga::getPage, "/page/{1}/{2}/{3}", Get);
         METHOD_ADD(Manga::listAvailable, "/listAvailable", Get);
         METHOD_ADD(Manga::getMetadata, "/getMetadata/{1}", Get);
