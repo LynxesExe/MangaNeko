@@ -121,3 +121,64 @@ void Manga::listAvailable(const HttpRequestPtr& req,
     resp->setStatusCode(k200OK);
     callback(resp);
 }
+
+void Manga::getMetadata(const HttpRequestPtr& req,
+    std::function<void(const HttpResponsePtr&)>&& callback,
+    std::string&& mangaName) const
+{
+    auto resp = HttpResponse::newHttpResponse();
+    resp->setStatusCode(k200OK);
+
+    std::filesystem::path currentFilePath(MangaNeko::globalConfiguration.entryPointPath);
+    currentFilePath.append(mangaName);
+
+    Json::Value mangaStructureRoot;
+    Json::Value mangaListArray(Json::arrayValue);
+
+    if (std::filesystem::exists(currentFilePath))
+    {
+
+        bit7z::BitArchiveReader archive{ Bit7ZipLibrarySingleton::getBit7zLibrarySingleton(), currentFilePath, bit7z::BitFormat::Zip };
+        auto archiveMetadata = archive.items();
+        std::sort(archiveMetadata.begin(), archiveMetadata.end(), [](const auto& lhs, const auto& rhs) {
+            return lhs.name() < rhs.name();
+            });
+
+        for (auto currentDirectory : archiveMetadata)
+        {
+            if (currentDirectory.isDir())
+            {
+                Json::Value chapterEntry(Json::objectValue);
+                // This won't work, we need for this to be a number, but how do we decide is chapters start from 0 or 1?
+                std::string strippedChapterName = currentDirectory.name();
+                strippedChapterName.erase(std::remove_if(strippedChapterName.begin(), strippedChapterName.end(), [](char c) {
+                        return !std::isdigit(c);
+                    }));
+                chapterEntry["chapter name"] = strippedChapterName;
+                // Starting from -1 since we need to take into account the directory entry
+                int pagesCount = -1;
+                for (auto currentPage : archiveMetadata)
+                {
+                    if (currentPage.path().find(currentDirectory.path()) != std::string::npos)
+                    {
+                        pagesCount++;
+                    }
+                }
+                chapterEntry["pages"] = pagesCount;
+                mangaListArray.append(chapterEntry);
+            }
+        }
+    }
+    else
+    {
+        resp->setStatusCode(k404NotFound);
+        resp->addHeader("manga-neko-error", "Manga entry not found.");
+    }
+
+    mangaStructureRoot["mangas"] = mangaListArray;
+
+    Json::StreamWriterBuilder builder;
+    std::string responseBody = Json::writeString(builder, mangaStructureRoot);
+    resp->setBody(responseBody);
+    callback(resp);
+}
