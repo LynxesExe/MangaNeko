@@ -1,5 +1,9 @@
 # Manga Neko
 
+# Alpha1 is ready!
+
+Check out the Wiki to get started!
+
 ## Was dis?
 
 Plex but for Mangas, essentially.
